@@ -3,24 +3,39 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-# Jupyter
+# Jupyter Notebook checkpoints
 .ipynb_checkpoints
+*/.ipynb_checkpoints/*
 
 # Virtual environments
 env/
 venv/
 .env
 .venv/
+ENV/
+
+# Data & Model weights (avoid committing large binary data)
+*.csv
+*.arff
+*.pkl
+*.joblib
+*.h5
+*.parquet
+!sample_data/*.csv
+
+# Evaluation & Metrics
+.deepeval/
 
 # OS files
 .DS_Store
 Thumbs.db
 
-# Python packaging
+# Python packaging & builds
 dist/
 build/
 *.egg-info/
 
-# Editor
+# IDE & Editors
 .vscode/
 .idea/
+*.swp

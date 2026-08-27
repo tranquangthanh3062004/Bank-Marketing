@@ -1,0 +1,20 @@
+# Core Data Science & Math
+numpy>=1.24.0
+pandas>=2.0.0
+scipy>=1.10.0
+
+# Visualization
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# Machine Learning & Imbalance
+scikit-learn>=1.3.0
+imbalanced-learn>=0.11.0
+
+# Explainability & Interpretability
+shap>=0.42.0
+
+# Jupyter Environment
+jupyterlab>=4.0.0
+notebook>=7.0.0
+ipywidgets>=8.0.0

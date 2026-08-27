@@ -3,16 +3,23 @@ requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "datascience"
+name = "bank-marketing"
 version = "0.1.0"
-description = "Repository for data science experiments and EDA notebooks"
+description = "Bank Marketing Term Deposit Prediction using Machine Learning and CRISP-DM methodology"
 authors = [
-  { name = "Your Name", email = "you@example.com" }
+  { name = "Tran Quang Thanh", email = "tranquangthanh3062004@gmail.com" }
 ]
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
 dependencies = [
-  "numpy>=1.24",
-  "pandas>=2.0",
-  "matplotlib>=3.6",
-  "scikit-learn>=1.2",
-  "jupyterlab>=4.0"
+  "numpy>=1.24.0",
+  "pandas>=2.0.0",
+  "scipy>=1.10.0",
+  "matplotlib>=3.7.0",
+  "seaborn>=0.12.0",
+  "scikit-learn>=1.3.0",
+  "imbalanced-learn>=0.11.0",
+  "shap>=0.42.0",
+  "jupyterlab>=4.0.0"
 ]
