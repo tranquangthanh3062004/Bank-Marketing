@@ -2,238 +2,238 @@
   "name": "term_deposit_predictor",
   "version": "1.0.0",
   "model_type": "lightgbm",
-  "created_at": "2026-09-04T06:11:30.542366+00:00",
-  "optimal_threshold": 0.1,
+  "created_at": "2026-09-04T06:32:20.922699+00:00",
+  "optimal_threshold": 0.09,
   "threshold_metrics": {
-    "optimal_threshold": 0.1,
-    "optimal_threshold_f1": 0.1,
-    "max_f1": 0.9939,
-    "optimal_threshold_profit": 0.1,
-    "max_profit_eur": 11890.0,
+    "optimal_threshold": 0.09,
+    "optimal_threshold_f1": 0.09,
+    "max_f1": 1.0,
+    "optimal_threshold_profit": 0.09,
+    "max_profit_eur": 15950.0,
     "curve_samples": [
       {
         "threshold": 0.05,
-        "precision": 0.82,
-        "recall": 0.988,
-        "f1": 0.8962,
-        "calls": 100,
-        "conversions": 82,
-        "net_profit_eur": 11800.0
+        "precision": 0.8148,
+        "recall": 1.0,
+        "f1": 0.898,
+        "calls": 135,
+        "conversions": 110,
+        "net_profit_eur": 15825.0
       },
       {
         "threshold": 0.1,
         "precision": 1.0,
-        "recall": 0.988,
-        "f1": 0.9939,
-        "calls": 82,
-        "conversions": 82,
-        "net_profit_eur": 11890.0
+        "recall": 1.0,
+        "f1": 1.0,
+        "calls": 110,
+        "conversions": 110,
+        "net_profit_eur": 15950.0
       },
       {
         "threshold": 0.15,
         "precision": 1.0,
-        "recall": 0.988,
-        "f1": 0.9939,
-        "calls": 82,
-        "conversions": 82,
-        "net_profit_eur": 11890.0
+        "recall": 1.0,
+        "f1": 1.0,
+        "calls": 110,
+        "conversions": 110,
+        "net_profit_eur": 15950.0
       },
       {
         "threshold": 0.2,
         "precision": 1.0,
-        "recall": 0.988,
-        "f1": 0.9939,
-        "calls": 82,
-        "conversions": 82,
-        "net_profit_eur": 11890.0
+        "recall": 1.0,
+        "f1": 1.0,
+        "calls": 110,
+        "conversions": 110,
+        "net_profit_eur": 15950.0
       },
       {
         "threshold": 0.25,
         "precision": 1.0,
-        "recall": 0.988,
-        "f1": 0.9939,
-        "calls": 82,
-        "conversions": 82,
-        "net_profit_eur": 11890.0
+        "recall": 1.0,
+        "f1": 1.0,
+        "calls": 110,
+        "conversions": 110,
+        "net_profit_eur": 15950.0
       },
       {
         "threshold": 0.3,
         "precision": 1.0,
-        "recall": 0.988,
-        "f1": 0.9939,
-        "calls": 82,
-        "conversions": 82,
-        "net_profit_eur": 11890.0
+        "recall": 1.0,
+        "f1": 1.0,
+        "calls": 110,
+        "conversions": 110,
+        "net_profit_eur": 15950.0
       },
       {
         "threshold": 0.35,
         "precision": 1.0,
-        "recall": 0.988,
-        "f1": 0.9939,
-        "calls": 82,
-        "conversions": 82,
-        "net_profit_eur": 11890.0
+        "recall": 1.0,
+        "f1": 1.0,
+        "calls": 110,
+        "conversions": 110,
+        "net_profit_eur": 15950.0
       },
       {
         "threshold": 0.4,
         "precision": 1.0,
-        "recall": 0.988,
-        "f1": 0.9939,
-        "calls": 82,
-        "conversions": 82,
-        "net_profit_eur": 11890.0
+        "recall": 1.0,
+        "f1": 1.0,
+        "calls": 110,
+        "conversions": 110,
+        "net_profit_eur": 15950.0
       },
       {
         "threshold": 0.45,
         "precision": 1.0,
-        "recall": 0.988,
-        "f1": 0.9939,
-        "calls": 82,
-        "conversions": 82,
-        "net_profit_eur": 11890.0
+        "recall": 1.0,
+        "f1": 1.0,
+        "calls": 110,
+        "conversions": 110,
+        "net_profit_eur": 15950.0
       },
       {
         "threshold": 0.5,
         "precision": 1.0,
-        "recall": 0.988,
-        "f1": 0.9939,
-        "calls": 82,
-        "conversions": 82,
-        "net_profit_eur": 11890.0
+        "recall": 1.0,
+        "f1": 1.0,
+        "calls": 110,
+        "conversions": 110,
+        "net_profit_eur": 15950.0
       },
       {
         "threshold": 0.55,
         "precision": 1.0,
-        "recall": 0.988,
-        "f1": 0.9939,
-        "calls": 82,
-        "conversions": 82,
-        "net_profit_eur": 11890.0
+        "recall": 1.0,
+        "f1": 1.0,
+        "calls": 110,
+        "conversions": 110,
+        "net_profit_eur": 15950.0
       },
       {
         "threshold": 0.6,
         "precision": 1.0,
-        "recall": 0.988,
-        "f1": 0.9939,
-        "calls": 82,
-        "conversions": 82,
-        "net_profit_eur": 11890.0
+        "recall": 1.0,
+        "f1": 1.0,
+        "calls": 110,
+        "conversions": 110,
+        "net_profit_eur": 15950.0
       },
       {
         "threshold": 0.65,
         "precision": 1.0,
-        "recall": 0.988,
-        "f1": 0.9939,
-        "calls": 82,
-        "conversions": 82,
-        "net_profit_eur": 11890.0
+        "recall": 1.0,
+        "f1": 1.0,
+        "calls": 110,
+        "conversions": 110,
+        "net_profit_eur": 15950.0
       },
       {
         "threshold": 0.7,
         "precision": 1.0,
-        "recall": 0.988,
-        "f1": 0.9939,
-        "calls": 82,
-        "conversions": 82,
-        "net_profit_eur": 11890.0
+        "recall": 1.0,
+        "f1": 1.0,
+        "calls": 110,
+        "conversions": 110,
+        "net_profit_eur": 15950.0
       },
       {
         "threshold": 0.75,
         "precision": 1.0,
-        "recall": 0.988,
-        "f1": 0.9939,
-        "calls": 82,
-        "conversions": 82,
-        "net_profit_eur": 11890.0
+        "recall": 1.0,
+        "f1": 1.0,
+        "calls": 110,
+        "conversions": 110,
+        "net_profit_eur": 15950.0
       },
       {
         "threshold": 0.8,
         "precision": 1.0,
-        "recall": 0.988,
-        "f1": 0.9939,
-        "calls": 82,
-        "conversions": 82,
-        "net_profit_eur": 11890.0
+        "recall": 1.0,
+        "f1": 1.0,
+        "calls": 110,
+        "conversions": 110,
+        "net_profit_eur": 15950.0
       },
       {
         "threshold": 0.85,
         "precision": 1.0,
-        "recall": 0.988,
-        "f1": 0.9939,
-        "calls": 82,
-        "conversions": 82,
-        "net_profit_eur": 11890.0
+        "recall": 1.0,
+        "f1": 1.0,
+        "calls": 110,
+        "conversions": 110,
+        "net_profit_eur": 15950.0
       },
       {
         "threshold": 0.9,
         "precision": 1.0,
-        "recall": 0.988,
-        "f1": 0.9939,
-        "calls": 82,
-        "conversions": 82,
-        "net_profit_eur": 11890.0
+        "recall": 1.0,
+        "f1": 1.0,
+        "calls": 110,
+        "conversions": 110,
+        "net_profit_eur": 15950.0
       },
       {
         "threshold": 0.95,
         "precision": 1.0,
-        "recall": 0.988,
-        "f1": 0.9939,
-        "calls": 82,
-        "conversions": 82,
-        "net_profit_eur": 11890.0
+        "recall": 1.0,
+        "f1": 1.0,
+        "calls": 110,
+        "conversions": 110,
+        "net_profit_eur": 15950.0
       }
     ]
   },
   "test_metrics": {
-    "roc_auc": 0.977,
-    "pr_auc": 0.9665,
-    "f1_score": 0.9589,
-    "precision": 0.9633,
-    "recall": 0.9545,
-    "threshold_used": 0.1,
+    "roc_auc": 1.0,
+    "pr_auc": 1.0,
+    "f1_score": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "threshold_used": 0.09,
     "confusion_matrix": [
       [
-        606,
-        4
+        813,
+        0
       ],
       [
-        5,
-        105
+        0,
+        147
       ]
     ]
   },
   "global_importance": [
     {
       "feature": "duration",
-      "importance": 1.4151
-    },
-    {
-      "feature": "age",
-      "importance": 0.5211
+      "importance": 1.5281
     },
     {
       "feature": "balance",
-      "importance": 0.4823
+      "importance": 0.5023
     },
     {
-      "feature": "month_aug",
-      "importance": 0.4804
+      "feature": "age",
+      "importance": 0.4719
     },
     {
       "feature": "financial_pressure_index",
-      "importance": 0.4221
+      "importance": 0.4541
+    },
+    {
+      "feature": "month_aug",
+      "importance": 0.4262
     },
     {
       "feature": "day",
-      "importance": 0.3483
+      "importance": 0.4111
     },
     {
-      "feature": "job_retired",
-      "importance": 0.1622
+      "feature": "contact_telephone",
+      "importance": 0.2581
     },
     {
-      "feature": "job_services",
-      "importance": 0.1549
+      "feature": "month_may",
+      "importance": 0.1911
     }
   ],
   "feature_names": [

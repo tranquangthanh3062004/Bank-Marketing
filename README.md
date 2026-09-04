@@ -5,7 +5,9 @@
 [![Methodology](https://img.shields.io/badge/Methodology-CRISP--DM-green.svg)](https://en.wikipedia.org/wiki/Cross-industry_standard_process_for_data_mining)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Dự án phân tích dữ liệu chuyên sâu (EDA) và xây dựng mô hình Học máy (Machine Learning) nhằm **dự đoán khả năng khách hàng đăng ký gửi tiền tiết kiệm có kỳ hạn (Term Deposit)** trong các chiến dịch Telemarketing của ngân hàng. Dự án được triển khai bài bản theo chuẩn quy trình **CRISP-DM**.
+Dự án phân tích dữ liệu chuyên sâu (EDA) và xây dựng mô hình Học máy (Machine Learning) nhằm **dự đoán khả năng khách hàng đăng ký gửi tiền tiết kiệm có kỳ hạn (Term Deposit)** trong các chiến dịch Telemarketing của ngân hàng. Dự án được triển khai bài bản theo chuẩn quy trình **CRISP-DM** kết hợp hệ thống **Data Lakehouse chuẩn AI Engine** (Medallion Architecture, Feature Store, SHAP và REST API).
+
+> 📖 **Cẩm nang toàn diện**: Xem chi tiết giải thích từng file và hướng dẫn vận hành hệ thống tại [CHI_TIET_CAC_FILE_VA_HUONG_DAN_SU_DUNG.md](CHI_TIET_CAC_FILE_VA_HUONG_DAN_SU_DUNG.md).
 
 ---
 
