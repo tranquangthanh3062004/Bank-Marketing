@@ -1,0 +1,25 @@
+lakehouse:
+  name: "bank_marketing_lakehouse"
+  database_path: "data/lakehouse/bank_lakehouse.duckdb"
+  
+  storage:
+    base_dir: "data/lakehouse"
+    bronze_dir: "data/lakehouse/bronze"
+    silver_dir: "data/lakehouse/silver"
+    gold_dir: "data/lakehouse/gold"
+    quarantine_dir: "data/lakehouse/quarantine"
+    raw_dir: "data/raw"
+
+  tables:
+    bronze_raw: "bronze_bank_telemarketing"
+    silver_customer: "dim_customer"
+    silver_interaction: "fact_campaign_interaction"
+    gold_campaign_mart: "mart_campaign_performance"
+    gold_segment_mart: "mart_customer_segment_conversion"
+    feature_store_offline: "offline_feature_store"
+    feature_store_online: "online_feature_store"
+
+  contracts:
+    enforce_schema: true
+    allow_quarantine: true
+    max_quarantine_pct: 0.10

@@ -1,0 +1,70 @@
+model:
+  name: "term_deposit_predictor"
+  version: "1.0.0"
+  registry_dir: "models"
+  default_model_type: "lightgbm" # options: "lightgbm", "logistic_regression"
+
+  dataset:
+    target_column: "y"
+    positive_label: "yes"
+    id_column: "customer_id"
+    test_size: 0.20
+    val_size: 0.15
+    random_state: 42
+
+  features:
+    numerical:
+      - "age"
+      - "balance"
+      - "day"
+      - "duration"
+      - "campaign"
+      - "pdays"
+      - "previous"
+      - "financial_pressure_index"
+      - "campaign_pressure_ratio"
+    categorical:
+      - "job"
+      - "marital"
+      - "education"
+      - "contact"
+      - "month"
+      - "poutcome"
+      - "balance_tier"
+      - "pdays_group"
+    binary:
+      - "default"
+      - "housing"
+      - "loan"
+      - "is_previously_contacted"
+      - "past_success_flag"
+
+  training:
+    logistic_regression:
+      max_iter: 1000
+      C: 1.0
+      class_weight: "balanced"
+      solver: "lbfgs"
+    lightgbm:
+      n_estimators: 150
+      learning_rate: 0.05
+      num_leaves: 31
+      class_weight: "balanced"
+      random_state: 42
+      importance_type: "gain"
+
+  threshold_tuning:
+    metric: "f1" # options: "f1", "net_profit"
+    # Kinh tế học Telemarketing:
+    # Lợi nhuận kỳ vọng trên 1 hợp đồng tiền gửi thành công (EUR)
+    deposit_profit_eur: 150.0
+    # Chi phí trung bình mỗi cuộc gọi Telesales (EUR)
+    call_cost_eur: 5.0
+    default_threshold: 0.50
+
+  serving:
+    priority_tiers:
+      tier_1_threshold: 0.70 # Hot Lead
+      tier_2_threshold: 0.45 # Warm Lead
+      tier_3_threshold: 0.25 # Cold / Consider
+      tier_4_threshold: 0.00 # Low priority / Do not call
