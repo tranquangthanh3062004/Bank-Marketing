@@ -128,16 +128,16 @@ BankMarketing/
 ├── requirements.txt         # Danh sách thư viện Python chi tiết
 ├── README.md                # Tài liệu tổng quan và hướng dẫn dự án
 ├── docs/                    # Tài liệu báo cáo, chỉ số thống kê & checklist EDA
-│   ├── Checklist EDA cho dataset.docx
-│   ├── Tong_hop_chi_so_thong_ke_DataScience_co_code.docx
-│   ├── ba'o ca'o  CRISP.docx
-│   ├── báo cáo 6 tuần.docx
-│   └── báo cáo tổng hợp insight .docx
 ├── notebooks/               # Jupyter Notebooks thực nghiệm phân tích & mô hình
-│   ├── BankMarketing.ipynb  # Notebook chính theo quy trình CRISP-DM chuẩn
-│   └── EDA_bank_.ipynb      # Notebook phân tích khám phá dữ liệu ban đầu
-├── sample_data/             # Thư mục chứa dữ liệu mẫu phục vụ kiểm thử nhanh
-└── src/                     # Module mã nguồn chuẩn hóa (Data Loader, Pipeline, Models)
+├── data_engineer/           # HỆ THỐNG DATA LAKEHOUSE CHUẨN AI ENGINE (Production Standard)
+│   ├── config/              # Cấu hình Lakehouse (Bronze, Silver, Gold, DuckDB) & Model
+│   ├── data/lakehouse/      # Lưu trữ Parquet phân tầng Medallion & DuckDB catalog
+│   ├── sample_data/         # Tệp dữ liệu mẫu chuẩn UCI Bank Marketing
+│   ├── models/              # Model Registry lưu trữ LightGBM weights & metadata
+│   ├── src/                 # Mã nguồn: lakehouse (ETL/Feature Store), ai_engine, serving (FastAPI)
+│   ├── tests/               # Bộ 20 bài test tự động bao phủ toàn diện
+│   └── README.md            # Hướng dẫn chi tiết vận hành Data Lakehouse & AI Engine
+└── src/                     # Core package ban đầu
     └── __init__.py
 ```
 

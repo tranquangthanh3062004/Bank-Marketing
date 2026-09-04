@@ -24,9 +24,18 @@ class LakehouseTransformation:
           - dim_customer
           - fact_campaign_interaction
         """
-        # Read from Bronze view
-        bronze_table = self.config.tables.bronze_raw
-        df_bronze = self.db.query_df(f"SELECT * FROM {bronze_table}")
+        bronze_dir = self.config.get_storage_path("bronze")
+        parquet_files = list(bronze_dir.glob("*.parquet"))
+        if not parquet_files:
+            from .ingestion import LakehouseIngestion
+            from ..config import PACKAGE_ROOT
+            sample_file = PACKAGE_ROOT / "sample_data" / "bank_raw_sample.csv"
+            ing = LakehouseIngestion(self.config)
+            ing.ingest_file(sample_file)
+            parquet_files = list(bronze_dir.glob("*.parquet"))
+
+        bronze_pattern = str(bronze_dir / "*.parquet").replace("\\", "/")
+        df_bronze = self.db.query_df(f"SELECT * FROM read_parquet('{bronze_pattern}')")
 
         if df_bronze.empty:
             raise ValueError("No records found in Bronze layer to transform!")

@@ -6,6 +6,12 @@ Provides commands for Lakehouse ELT, Feature Store, Model Training, Scoring, and
 import argparse
 import sys
 from pathlib import Path
+
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+
 from .ai_engine.evaluator import ModelEvaluator
 from .ai_engine.explainability import ModelExplainer
 from .ai_engine.registry import ModelRegistry
@@ -19,10 +25,10 @@ from .serving.batch_scorer import BatchLeadScorer
 
 
 def cmd_ingest(args):
-    print(f"🚀 [Lakehouse] Ingesting raw data from: {args.source}")
+    print(f"[*] [Lakehouse] Ingesting raw data from: {args.source}")
     ingestion = LakehouseIngestion()
     res = ingestion.ingest_file(args.source)
-    print("✅ Ingestion Completed!")
+    print("[OK] Ingestion Completed!")
     print(f"   Batch ID: {res['batch_id']}")
     print(f"   Ingested: {res['ingested_records']} records")
     print(f"   Quarantined: {res['quarantined_records']} records")
@@ -30,28 +36,28 @@ def cmd_ingest(args):
 
 
 def cmd_transform_silver(args):
-    print("🚀 [Lakehouse] Transforming Bronze -> Silver (Cleaning & Conforming Star Schema)...")
+    print("[*] [Lakehouse] Transforming Bronze -> Silver (Cleaning & Conforming Star Schema)...")
     trans = LakehouseTransformation()
     res = trans.process_silver()
-    print("✅ Silver Transformation Completed!")
+    print("[OK] Silver Transformation Completed!")
     print(f"   Conformed dim_customer: {res['dim_customer_count']} rows")
     print(f"   Conformed fact_campaign_interaction: {res['fact_interaction_count']} rows")
 
 
 def cmd_transform_gold(args):
-    print("🚀 [Lakehouse] Generating Gold Analytical Marts...")
+    print("[*] [Lakehouse] Generating Gold Analytical Marts...")
     marts = LakehouseMarts()
     res = marts.build_marts()
-    print("✅ Gold Marts Generation Completed!")
+    print("[OK] Gold Marts Generation Completed!")
     print(f"   Campaign Performance Mart: {res['campaign_mart_rows']} rows")
     print(f"   Customer Segment Mart: {res['segment_mart_rows']} rows")
 
 
 def cmd_build_features(args):
-    print("🚀 [Lakehouse] Building Offline & Online Feature Store...")
+    print("[*] [Lakehouse] Building Offline & Online Feature Store...")
     fs = FeatureStore()
     df_feat = fs.build_offline_feature_store()
-    print(f"✅ Feature Store Built! Generated {len(df_feat)} rows with {len(df_feat.columns)} feature columns.")
+    print(f"[OK] Feature Store Built! Generated {len(df_feat)} rows with {len(df_feat.columns)} feature columns.")
 
 
 def cmd_run_lakehouse(args):
@@ -64,11 +70,11 @@ def cmd_run_lakehouse(args):
     cmd_transform_silver(args)
     cmd_transform_gold(args)
     cmd_build_features(args)
-    print("🎉 All Lakehouse Layers (Bronze -> Silver -> Gold -> Features) successfully processed!")
+    print("[SUCCESS] All Lakehouse Layers (Bronze -> Silver -> Gold -> Features) successfully processed!")
 
 
 def cmd_train(args):
-    print(f"🤖 [AI Engine] Training model type: {args.model}")
+    print(f"[*] [AI Engine] Training model type: {args.model}")
     fs = FeatureStore()
     df_features = fs.get_offline_features()
 
@@ -107,7 +113,7 @@ def cmd_train(args):
         model_type=args.model,
     )
 
-    print("✅ Model Training & Registration Completed!")
+    print("[OK] Model Training & Registration Completed!")
     print(f"   ROC-AUC: {test_metrics['roc_auc']:.4f} | PR-AUC: {test_metrics['pr_auc']:.4f}")
     print(f"   F1-Score: {test_metrics['f1_score']:.4f} (at Optimal Threshold {test_metrics['threshold_used']})")
     print(f"   Precision: {test_metrics['precision']:.4f} | Recall: {test_metrics['recall']:.4f}")
@@ -118,12 +124,12 @@ def cmd_train(args):
 
 
 def cmd_batch_score(args):
-    print(f"🎯 [Serving] Batch Lead Scoring on: {args.input}")
+    print(f"[*] [Serving] Batch Lead Scoring on: {args.input}")
     output = args.output or str(PACKAGE_ROOT / "sample_data" / "scored_leads_output.csv")
     scorer = BatchLeadScorer()
     scored_df = scorer.score_file(args.input, output)
 
-    print(f"✅ Scored {len(scored_df)} leads successfully! Saved to: {output}")
+    print(f"[OK] Scored {len(scored_df)} leads successfully! Saved to: {output}")
     print("   Priority Breakdown:")
     tier_counts = scored_df["priority_tier"].value_counts()
     for tier, count in tier_counts.items():
@@ -132,7 +138,7 @@ def cmd_batch_score(args):
 
 def cmd_serve(args):
     import uvicorn
-    print(f"🌐 [Serving] Launching FastAPI Lead Scoring Service on http://{args.host}:{args.port} ...")
+    print(f"[*] [Serving] Launching FastAPI Lead Scoring Service on http://{args.host}:{args.port} ...")
     uvicorn.run("data_engineer.src.serving.app:app", host=args.host, port=args.port, reload=args.reload)
 
 
@@ -147,7 +153,7 @@ def cmd_run_all(args):
     args.input = str(PACKAGE_ROOT / "sample_data" / "leads_to_score.csv")
     args.output = str(PACKAGE_ROOT / "sample_data" / "scored_leads_output.csv")
     cmd_batch_score(args)
-    print("\n🎉 Complete Lakehouse & AI Engine Pipeline successfully executed from end-to-end!")
+    print("\n[SUCCESS] Complete Lakehouse & AI Engine Pipeline successfully executed from end-to-end!")
 
 
 def main():

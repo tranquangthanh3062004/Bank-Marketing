@@ -5,8 +5,8 @@ Enforces schema validation and guards against data corruption or drift.
 
 from typing import List, Literal, Optional, Tuple
 import pandas as pd
-import pandera as pa
-from pandera import Check, Column, DataFrameSchema
+import pandera.pandas as pa
+from pandera.pandas import Check, Column, DataFrameSchema
 from pydantic import BaseModel, Field, field_validator
 
 

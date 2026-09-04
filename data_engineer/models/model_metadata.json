@@ -2,238 +2,238 @@
   "name": "term_deposit_predictor",
   "version": "1.0.0",
   "model_type": "lightgbm",
-  "created_at": "2026-09-04T06:07:49.505875+00:00",
-  "optimal_threshold": 0.52,
+  "created_at": "2026-09-04T06:11:30.542366+00:00",
+  "optimal_threshold": 0.1,
   "threshold_metrics": {
-    "optimal_threshold": 0.52,
-    "optimal_threshold_f1": 0.52,
-    "max_f1": 0.6061,
-    "optimal_threshold_profit": 0.06,
-    "max_profit_eur": 1840.0,
+    "optimal_threshold": 0.1,
+    "optimal_threshold_f1": 0.1,
+    "max_f1": 0.9939,
+    "optimal_threshold_profit": 0.1,
+    "max_profit_eur": 11890.0,
     "curve_samples": [
       {
         "threshold": 0.05,
-        "precision": 0.2545,
-        "recall": 1.0,
-        "f1": 0.4058,
-        "calls": 55,
-        "conversions": 14,
-        "net_profit_eur": 1825.0
+        "precision": 0.82,
+        "recall": 0.988,
+        "f1": 0.8962,
+        "calls": 100,
+        "conversions": 82,
+        "net_profit_eur": 11800.0
       },
       {
         "threshold": 0.1,
-        "precision": 0.2609,
-        "recall": 0.8571,
-        "f1": 0.4,
-        "calls": 46,
-        "conversions": 12,
-        "net_profit_eur": 1570.0
+        "precision": 1.0,
+        "recall": 0.988,
+        "f1": 0.9939,
+        "calls": 82,
+        "conversions": 82,
+        "net_profit_eur": 11890.0
       },
       {
         "threshold": 0.15,
-        "precision": 0.275,
-        "recall": 0.7857,
-        "f1": 0.4074,
-        "calls": 40,
-        "conversions": 11,
-        "net_profit_eur": 1450.0
+        "precision": 1.0,
+        "recall": 0.988,
+        "f1": 0.9939,
+        "calls": 82,
+        "conversions": 82,
+        "net_profit_eur": 11890.0
       },
       {
         "threshold": 0.2,
-        "precision": 0.2895,
-        "recall": 0.7857,
-        "f1": 0.4231,
-        "calls": 38,
-        "conversions": 11,
-        "net_profit_eur": 1460.0
+        "precision": 1.0,
+        "recall": 0.988,
+        "f1": 0.9939,
+        "calls": 82,
+        "conversions": 82,
+        "net_profit_eur": 11890.0
       },
       {
         "threshold": 0.25,
-        "precision": 0.3143,
-        "recall": 0.7857,
-        "f1": 0.449,
-        "calls": 35,
-        "conversions": 11,
-        "net_profit_eur": 1475.0
+        "precision": 1.0,
+        "recall": 0.988,
+        "f1": 0.9939,
+        "calls": 82,
+        "conversions": 82,
+        "net_profit_eur": 11890.0
       },
       {
         "threshold": 0.3,
-        "precision": 0.3548,
-        "recall": 0.7857,
-        "f1": 0.4889,
-        "calls": 31,
-        "conversions": 11,
-        "net_profit_eur": 1495.0
+        "precision": 1.0,
+        "recall": 0.988,
+        "f1": 0.9939,
+        "calls": 82,
+        "conversions": 82,
+        "net_profit_eur": 11890.0
       },
       {
         "threshold": 0.35,
-        "precision": 0.4231,
-        "recall": 0.7857,
-        "f1": 0.55,
-        "calls": 26,
-        "conversions": 11,
-        "net_profit_eur": 1520.0
+        "precision": 1.0,
+        "recall": 0.988,
+        "f1": 0.9939,
+        "calls": 82,
+        "conversions": 82,
+        "net_profit_eur": 11890.0
       },
       {
         "threshold": 0.4,
-        "precision": 0.4167,
-        "recall": 0.7143,
-        "f1": 0.5263,
-        "calls": 24,
-        "conversions": 10,
-        "net_profit_eur": 1380.0
+        "precision": 1.0,
+        "recall": 0.988,
+        "f1": 0.9939,
+        "calls": 82,
+        "conversions": 82,
+        "net_profit_eur": 11890.0
       },
       {
         "threshold": 0.45,
-        "precision": 0.4762,
-        "recall": 0.7143,
-        "f1": 0.5714,
-        "calls": 21,
-        "conversions": 10,
-        "net_profit_eur": 1395.0
+        "precision": 1.0,
+        "recall": 0.988,
+        "f1": 0.9939,
+        "calls": 82,
+        "conversions": 82,
+        "net_profit_eur": 11890.0
       },
       {
         "threshold": 0.5,
-        "precision": 0.5,
-        "recall": 0.7143,
-        "f1": 0.5882,
-        "calls": 20,
-        "conversions": 10,
-        "net_profit_eur": 1400.0
+        "precision": 1.0,
+        "recall": 0.988,
+        "f1": 0.9939,
+        "calls": 82,
+        "conversions": 82,
+        "net_profit_eur": 11890.0
       },
       {
         "threshold": 0.55,
-        "precision": 0.5263,
-        "recall": 0.7143,
-        "f1": 0.6061,
-        "calls": 19,
-        "conversions": 10,
-        "net_profit_eur": 1405.0
+        "precision": 1.0,
+        "recall": 0.988,
+        "f1": 0.9939,
+        "calls": 82,
+        "conversions": 82,
+        "net_profit_eur": 11890.0
       },
       {
         "threshold": 0.6,
-        "precision": 0.5333,
-        "recall": 0.5714,
-        "f1": 0.5517,
-        "calls": 15,
-        "conversions": 8,
-        "net_profit_eur": 1125.0
+        "precision": 1.0,
+        "recall": 0.988,
+        "f1": 0.9939,
+        "calls": 82,
+        "conversions": 82,
+        "net_profit_eur": 11890.0
       },
       {
         "threshold": 0.65,
-        "precision": 0.6154,
-        "recall": 0.5714,
-        "f1": 0.5926,
-        "calls": 13,
-        "conversions": 8,
-        "net_profit_eur": 1135.0
+        "precision": 1.0,
+        "recall": 0.988,
+        "f1": 0.9939,
+        "calls": 82,
+        "conversions": 82,
+        "net_profit_eur": 11890.0
       },
       {
         "threshold": 0.7,
-        "precision": 0.6364,
-        "recall": 0.5,
-        "f1": 0.56,
-        "calls": 11,
-        "conversions": 7,
-        "net_profit_eur": 995.0
+        "precision": 1.0,
+        "recall": 0.988,
+        "f1": 0.9939,
+        "calls": 82,
+        "conversions": 82,
+        "net_profit_eur": 11890.0
       },
       {
         "threshold": 0.75,
-        "precision": 0.5714,
-        "recall": 0.2857,
-        "f1": 0.381,
-        "calls": 7,
-        "conversions": 4,
-        "net_profit_eur": 565.0
+        "precision": 1.0,
+        "recall": 0.988,
+        "f1": 0.9939,
+        "calls": 82,
+        "conversions": 82,
+        "net_profit_eur": 11890.0
       },
       {
         "threshold": 0.8,
-        "precision": 0.6667,
-        "recall": 0.2857,
-        "f1": 0.4,
-        "calls": 6,
-        "conversions": 4,
-        "net_profit_eur": 570.0
+        "precision": 1.0,
+        "recall": 0.988,
+        "f1": 0.9939,
+        "calls": 82,
+        "conversions": 82,
+        "net_profit_eur": 11890.0
       },
       {
         "threshold": 0.85,
-        "precision": 0.6667,
-        "recall": 0.2857,
-        "f1": 0.4,
-        "calls": 6,
-        "conversions": 4,
-        "net_profit_eur": 570.0
+        "precision": 1.0,
+        "recall": 0.988,
+        "f1": 0.9939,
+        "calls": 82,
+        "conversions": 82,
+        "net_profit_eur": 11890.0
       },
       {
         "threshold": 0.9,
-        "precision": 0.75,
-        "recall": 0.2143,
-        "f1": 0.3333,
-        "calls": 4,
-        "conversions": 3,
-        "net_profit_eur": 430.0
+        "precision": 1.0,
+        "recall": 0.988,
+        "f1": 0.9939,
+        "calls": 82,
+        "conversions": 82,
+        "net_profit_eur": 11890.0
       },
       {
         "threshold": 0.95,
         "precision": 1.0,
-        "recall": 0.0714,
-        "f1": 0.1333,
-        "calls": 1,
-        "conversions": 1,
-        "net_profit_eur": 145.0
+        "recall": 0.988,
+        "f1": 0.9939,
+        "calls": 82,
+        "conversions": 82,
+        "net_profit_eur": 11890.0
       }
     ]
   },
   "test_metrics": {
-    "roc_auc": 0.6618,
-    "pr_auc": 0.2819,
-    "f1_score": 0.1622,
-    "precision": 0.1579,
-    "recall": 0.1667,
-    "threshold_used": 0.52,
+    "roc_auc": 0.977,
+    "pr_auc": 0.9665,
+    "f1_score": 0.9589,
+    "precision": 0.9633,
+    "recall": 0.9545,
+    "threshold_used": 0.1,
     "confusion_matrix": [
       [
-        86,
-        16
+        606,
+        4
       ],
       [
-        15,
-        3
+        5,
+        105
       ]
     ]
   },
   "global_importance": [
     {
       "feature": "duration",
-      "importance": 1.1899
-    },
-    {
-      "feature": "balance",
-      "importance": 0.546
+      "importance": 1.4151
     },
     {
       "feature": "age",
-      "importance": 0.5163
+      "importance": 0.5211
     },
     {
-      "feature": "day",
-      "importance": 0.4764
-    },
-    {
-      "feature": "month_may",
-      "importance": 0.321
+      "feature": "balance",
+      "importance": 0.4823
     },
     {
       "feature": "month_aug",
-      "importance": 0.2263
+      "importance": 0.4804
     },
     {
       "feature": "financial_pressure_index",
-      "importance": 0.2119
+      "importance": 0.4221
+    },
+    {
+      "feature": "day",
+      "importance": 0.3483
     },
     {
       "feature": "job_retired",
-      "importance": 0.2035
+      "importance": 0.1622
+    },
+    {
+      "feature": "job_services",
+      "importance": 0.1549
     }
   ],
   "feature_names": [

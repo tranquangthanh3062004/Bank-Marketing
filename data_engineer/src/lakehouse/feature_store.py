@@ -23,8 +23,16 @@ class FeatureStore:
         Build Offline Feature Store combining Silver tables with derived engineering logic.
         Generates clean, leakage-free feature vectors for AI training.
         """
-        silver_cust = self.config.tables.silver_customer
-        silver_fact = self.config.tables.silver_interaction
+        cust_file = self.config.get_storage_path("silver") / f"{self.config.tables.silver_customer}.parquet"
+        fact_file = self.config.get_storage_path("silver") / f"{self.config.tables.silver_interaction}.parquet"
+
+        if not cust_file.exists() or not fact_file.exists():
+            from .transformation import LakehouseTransformation
+            trans = LakehouseTransformation(self.config)
+            trans.process_silver()
+
+        cust_path = str(cust_file).replace("\\", "/")
+        fact_path = str(fact_file).replace("\\", "/")
 
         feature_sql = f"""
             SELECT
@@ -68,8 +76,8 @@ class FeatureStore:
                 CASE WHEN f.pdays != -1 THEN 1 ELSE 0 END AS is_previously_contacted,
                 CASE WHEN f.poutcome = 'success' THEN 1 ELSE 0 END AS past_success_flag,
                 f.y
-            FROM {silver_cust} c
-            JOIN {silver_fact} f ON c.customer_id = f.customer_id
+            FROM read_parquet('{cust_path}') c
+            JOIN read_parquet('{fact_path}') f ON c.customer_id = f.customer_id
         """
         df_features = self.db.query_df(feature_sql)
 

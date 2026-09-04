@@ -22,8 +22,16 @@ class LakehouseMarts:
           - mart_campaign_performance
           - mart_customer_segment_conversion
         """
-        silver_cust = self.config.tables.silver_customer
-        silver_fact = self.config.tables.silver_interaction
+        cust_file = self.config.get_storage_path("silver") / f"{self.config.tables.silver_customer}.parquet"
+        fact_file = self.config.get_storage_path("silver") / f"{self.config.tables.silver_interaction}.parquet"
+
+        if not cust_file.exists() or not fact_file.exists():
+            from .transformation import LakehouseTransformation
+            trans = LakehouseTransformation(self.config)
+            trans.process_silver()
+
+        cust_path = str(cust_file).replace("\\", "/")
+        fact_path = str(fact_file).replace("\\", "/")
 
         # 1. Campaign Performance Mart SQL
         campaign_mart_sql = f"""
@@ -39,7 +47,7 @@ class LakehouseMarts:
                 ROUND(AVG(f.duration), 1) AS avg_duration_seconds,
                 SUM(CASE WHEN f.y = 'yes' THEN 1 ELSE 0 END) AS total_conversions,
                 ROUND(SUM(CASE WHEN f.y = 'yes' THEN 1.0 ELSE 0.0 END) / COUNT(*), 4) AS conversion_rate
-            FROM {silver_fact} f
+            FROM read_parquet('{fact_path}') f
             GROUP BY 1, 2, 3
             ORDER BY total_conversions DESC
         """
@@ -56,8 +64,8 @@ class LakehouseMarts:
                 ROUND(AVG(c.balance), 2) AS avg_balance_eur,
                 SUM(CASE WHEN f.y = 'yes' THEN 1 ELSE 0 END) AS total_conversions,
                 ROUND(SUM(CASE WHEN f.y = 'yes' THEN 1.0 ELSE 0.0 END) / COUNT(*), 4) AS conversion_rate
-            FROM {silver_cust} c
-            JOIN {silver_fact} f ON c.customer_id = f.customer_id
+            FROM read_parquet('{cust_path}') c
+            JOIN read_parquet('{fact_path}') f ON c.customer_id = f.customer_id
             GROUP BY 1, 2, 3, 4
             ORDER BY conversion_rate DESC
         """
