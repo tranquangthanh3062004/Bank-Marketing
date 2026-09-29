@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bank-marketing-config
+  namespace: default
+data:
+  HOST: "0.0.0.0"
+  PORT: "8000"
+  REQUIRE_API_KEY: "false"
+  DEFAULT_INFERENCE_MODE: "auto"
+  LOG_LEVEL: "info"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: bank-marketing-secret
+  namespace: default
+type: Opaque
+stringData:
+  BANK_MARKETING_API_KEY: "bm-enterprise-prod-secret-key-2026"

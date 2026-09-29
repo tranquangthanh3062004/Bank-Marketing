@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "model_type": "lightgbm",
   "mode": "post_call",
-  "created_at": "2026-09-29T09:51:08.470993+00:00",
+  "created_at": "2026-09-29T10:02:01.234993+00:00",
   "optimal_threshold": 0.52,
   "threshold_metrics": {
     "optimal_threshold": 0.52,
@@ -203,40 +203,7 @@
       ]
     ]
   },
-  "global_importance": [
-    {
-      "feature": "duration",
-      "importance": 1.1899
-    },
-    {
-      "feature": "balance",
-      "importance": 0.546
-    },
-    {
-      "feature": "age",
-      "importance": 0.5163
-    },
-    {
-      "feature": "day",
-      "importance": 0.4764
-    },
-    {
-      "feature": "month_may",
-      "importance": 0.321
-    },
-    {
-      "feature": "month_aug",
-      "importance": 0.2263
-    },
-    {
-      "feature": "financial_pressure_index",
-      "importance": 0.2119
-    },
-    {
-      "feature": "job_retired",
-      "importance": 0.2035
-    }
-  ],
+  "global_importance": [],
   "feature_names": [
     "age",
     "balance",

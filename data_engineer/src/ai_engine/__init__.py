@@ -9,6 +9,7 @@ from .evaluator import ModelEvaluator
 from .explainability import ModelExplainer
 from .registry import ModelRegistry
 from .drift_monitor import DriftMonitor
+from .fairness_audit import FairnessAuditor
 
 __all__ = [
     "FeaturePipeline",
@@ -17,4 +18,5 @@ __all__ = [
     "ModelExplainer",
     "ModelRegistry",
     "DriftMonitor",
+    "FairnessAuditor",
 ]

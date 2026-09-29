@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "model_type": "lightgbm",
   "mode": "pre_call",
-  "created_at": "2026-09-29T09:51:07.257865+00:00",
+  "created_at": "2026-09-29T10:02:00.152525+00:00",
   "optimal_threshold": 0.05,
   "threshold_metrics": {
     "optimal_threshold": 0.05,
@@ -203,40 +203,7 @@
       ]
     ]
   },
-  "global_importance": [
-    {
-      "feature": "balance",
-      "importance": 0.6093
-    },
-    {
-      "feature": "age",
-      "importance": 0.5457
-    },
-    {
-      "feature": "day",
-      "importance": 0.4218
-    },
-    {
-      "feature": "month_may",
-      "importance": 0.2794
-    },
-    {
-      "feature": "financial_pressure_index",
-      "importance": 0.2549
-    },
-    {
-      "feature": "contact_cellular",
-      "importance": 0.2407
-    },
-    {
-      "feature": "campaign",
-      "importance": 0.2321
-    },
-    {
-      "feature": "month_aug",
-      "importance": 0.2217
-    }
-  ],
+  "global_importance": [],
   "feature_names": [
     "age",
     "balance",

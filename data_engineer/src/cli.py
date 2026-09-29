@@ -164,6 +164,25 @@ def cmd_run_all(args):
     print("\n[SUCCESS] Complete Lakehouse & AI Engine Pipeline successfully executed from end-to-end!")
 
 
+def cmd_enterprise(args):
+    print("==================================================================")
+    print("   ENTERPRISE FULL-LIFECYCLE DAG WORKFLOW PIPELINE RUNNER        ")
+    print("==================================================================")
+    from .orchestration.workflow_runner import EnterpriseWorkflowOrchestrator
+    orchestrator = EnterpriseWorkflowOrchestrator()
+    res = orchestrator.run_daily_pipeline(getattr(args, "source", None))
+    print("[SUCCESS] Enterprise Workflow Execution Completed!")
+    print(f"   Execution Time: {res['execution_time_seconds']}s")
+    print(f"   Ingested: {res['ingested_records']} records")
+    print(f"   De-identified Tokens Verified: {res['deidentified_tokens_verified']}")
+    print(f"   Feature Store Rows: {res['feature_store_records']}")
+    for mode, m_info in res["models"].items():
+        print(f"   Model [{mode}]:")
+        print(f"     - Optimal Threshold: {m_info['threshold']}")
+        print(f"     - ROC-AUC: {m_info['test_metrics']['roc_auc']:.4f}")
+        print(f"     - SR 11-7 Fairness Status: {m_info['fairness_audit'].get('sr_11_7_status')}")
+
+
 def main():
     parser = argparse.ArgumentParser(
         prog="data-engineer",
@@ -209,6 +228,10 @@ def main():
     p_all.add_argument("--source", default=None, help="Optional raw source path")
     p_all.add_argument("--model", default="lightgbm", choices=["lightgbm", "logistic_regression"])
 
+    # Enterprise Run
+    p_ent = subparsers.add_parser("enterprise-run", help="Run full Enterprise DAG: PII, Lakehouse, Dual-Model, SR 11-7")
+    p_ent.add_argument("--source", default=None, help="Optional raw source path")
+
     args = parser.parse_args()
 
     if not args.command:
@@ -225,6 +248,7 @@ def main():
         "batch-score": cmd_batch_score,
         "serve": cmd_serve,
         "run-all": cmd_run_all,
+        "enterprise-run": cmd_enterprise,
     }
 
     cmd_map[args.command](args)

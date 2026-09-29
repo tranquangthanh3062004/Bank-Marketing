@@ -1,20 +1,29 @@
 """
 FastAPI REST Service for Real-Time Telemarketing Lead Scoring and Explainable AI.
 Supports Dual-Model Architecture: Pre-Call Prioritization & Post-Call Evaluation.
-Provides sub-second inference with SHAP factor breakdown and optional API Key security.
+Enterprise Features:
+- Closed-Loop CTI / Call Center Feedback Integration
+- Prometheus Metrics (/metrics) for APM and Grafana Dashboards
+- Population Stability Index (PSI) Drift Detection
+- API Key Security and Healthchecks
 """
 
 from contextlib import asynccontextmanager
 import os
+import time
 from typing import Any, Dict, List, Optional
 from fastapi import Depends, FastAPI, Header, HTTPException, status
+from fastapi.responses import PlainTextResponse
 import numpy as np
 import pandas as pd
+from ..ai_engine.drift_monitor import DriftMonitor
 from ..ai_engine.explainability import ModelExplainer
 from ..ai_engine.registry import ModelRegistry
 from ..config import load_lakehouse_config, load_model_config
 from ..lakehouse.contracts import CustomerLeadPayload
 from ..lakehouse.feature_store import FeatureStore
+from .feedback_loop import CallFeedbackPayload, FeedbackLoopManager
+from .metrics import metrics
 
 
 # Context state storage
@@ -84,26 +93,30 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="Bank Marketing AI Lakehouse Lead Scoring API",
-    description="Enterprise Real-Time Inference & Explainability Service for Term Deposit Conversion",
-    version="1.1.0",
+    title="Bank Marketing Enterprise Lead Scoring & AI Lakehouse API",
+    description="Enterprise Real-Time Inference, Explainability, and Closed-Loop CRM Integration",
+    version="2.0.0",
     lifespan=lifespan,
 )
 
 
 @app.get("/", tags=["General"])
 def root():
+    metrics.record_request()
     return {
-        "service": "Bank Marketing AI Lead Scoring Engine",
+        "service": "Bank Marketing Enterprise AI Lead Scoring Engine",
         "status": "online",
         "docs_url": "/docs",
-        "version": "1.1.0",
+        "metrics_url": "/metrics",
+        "version": "2.0.0",
         "supported_modes": ["pre_call", "post_call"],
+        "compliance": ["Decree 13/2023/ND-CP", "SR 11-7 Ethical AI", "OpenMetrics/Prometheus"],
     }
 
 
 @app.get("/health", tags=["General"])
 def health():
+    metrics.record_request()
     post_ready = state.get("model") is not None
     pre_ready = state.get("pre_call_model") is not None
     return {
@@ -116,8 +129,15 @@ def health():
     }
 
 
+@app.get("/metrics", tags=["Observability"], response_class=PlainTextResponse)
+def get_prometheus_metrics():
+    """Exposes real-time Prometheus / Grafana metrics endpoint."""
+    return metrics.to_prometheus_format()
+
+
 @app.get("/api/v1/model/info", tags=["AI Engine"])
 def get_model_info(mode: str = "post_call"):
+    metrics.record_request()
     if mode == "pre_call" and state.get("pre_call_metadata"):
         return state["pre_call_metadata"]
     if not state.get("model"):
@@ -126,6 +146,7 @@ def get_model_info(mode: str = "post_call"):
 
 
 def _score_lead_internal(payload: CustomerLeadPayload, mode: str = "post_call") -> Dict[str, Any]:
+    t0 = time.time()
     target_model = state.get("pre_call_model") if mode == "pre_call" else state.get("model")
     target_pipeline = state.get("pre_call_pipeline") if mode == "pre_call" else state.get("pipeline")
     target_explainer = state.get("pre_call_explainer") if mode == "pre_call" else state.get("explainer")
@@ -170,6 +191,9 @@ def _score_lead_internal(payload: CustomerLeadPayload, mode: str = "post_call") 
         except Exception:
             pass
 
+    dur_sec = time.time() - t0
+    metrics.record_prediction(tier, mode, dur_sec)
+
     return {
         "customer_id": payload.customer_id,
         "mode": mode,
@@ -180,6 +204,7 @@ def _score_lead_internal(payload: CustomerLeadPayload, mode: str = "post_call") 
         "recommended_action": action,
         "top_positive_drivers": drivers.get("positive_drivers", []),
         "top_negative_barriers": drivers.get("negative_drivers", []),
+        "latency_ms": round(dur_sec * 1000, 2),
     }
 
 
@@ -188,10 +213,7 @@ def predict_pre_call(
     payload: CustomerLeadPayload,
     _auth: Optional[str] = Depends(verify_api_key),
 ):
-    """
-    Score incoming lead BEFORE dialing (duration is excluded to prevent lookahead bias).
-    Ideal for morning telesales dialing priority queue.
-    """
+    """Score incoming lead BEFORE dialing (duration excluded to prevent lookahead bias)."""
     return _score_lead_internal(payload, mode="pre_call")
 
 
@@ -200,9 +222,7 @@ def predict_post_call(
     payload: CustomerLeadPayload,
     _auth: Optional[str] = Depends(verify_api_key),
 ):
-    """
-    Score customer AFTER conversation (includes duration for accurate post-call conversion scoring).
-    """
+    """Score customer AFTER conversation (includes actual call duration)."""
     return _score_lead_internal(payload, mode="post_call")
 
 
@@ -211,11 +231,7 @@ def predict_lead(
     payload: CustomerLeadPayload,
     _auth: Optional[str] = Depends(verify_api_key),
 ):
-    """
-    Smart router endpoint:
-    - If duration == 0, routes to pre-call scoring.
-    - If duration > 0, routes to post-call scoring.
-    """
+    """Smart router: routes to pre-call if duration <= 0, else post-call."""
     mode = "pre_call" if (payload.duration is None or payload.duration == 0) else "post_call"
     return _score_lead_internal(payload, mode=mode)
 
@@ -226,10 +242,7 @@ def batch_predict(
     mode: str = "auto",
     _auth: Optional[str] = Depends(verify_api_key),
 ):
-    """
-    Batch score a list of customer leads.
-    mode can be 'auto', 'pre_call', or 'post_call'.
-    """
+    """Batch score a list of customer leads."""
     results = []
     for lead in leads:
         lead_mode = mode
@@ -239,14 +252,47 @@ def batch_predict(
     return {"total_scored": len(results), "leads": results}
 
 
+@app.post("/api/v1/telemarketing/feedback", tags=["Closed-Loop CRM"])
+def submit_call_feedback(
+    payload: CallFeedbackPayload,
+    _auth: Optional[str] = Depends(verify_api_key),
+):
+    """
+    Record Telesales call outcome (agreed/declined/callback/unreachable)
+    and append to the Lakehouse feedback log for closed-loop continuous learning.
+    """
+    loop_mgr = FeedbackLoopManager()
+    res = loop_mgr.record_feedback(payload)
+    metrics.record_feedback(payload.outcome)
+    return res
+
+
+@app.post("/api/v1/monitor/drift", tags=["MLOps"])
+def check_population_drift(
+    leads: List[CustomerLeadPayload],
+    _auth: Optional[str] = Depends(verify_api_key),
+):
+    """
+    Evaluate Population Stability Index (PSI) drift between baseline and incoming leads batch.
+    """
+    fs: FeatureStore = state.get("feature_store")
+    if not fs:
+        raise HTTPException(status_code=503, detail="Feature store not initialized.")
+    df_baseline = fs.get_offline_features()
+    df_incoming = pd.DataFrame([l.model_dump() for l in leads])
+    monitor = DriftMonitor(baseline_df=df_baseline)
+    res = monitor.evaluate_drift(df_incoming)
+    if res["drift_detected"]:
+        metrics.record_drift_event()
+    return res
+
+
 @app.get("/api/v1/features/{customer_id}", tags=["Feature Store"])
 def get_customer_features(
     customer_id: str,
     _auth: Optional[str] = Depends(verify_api_key),
 ):
-    """
-    Retrieve online features for an existing customer from the Lakehouse.
-    """
+    """Retrieve online features for an existing customer from the Lakehouse."""
     fs: FeatureStore = state.get("feature_store")
     if not fs:
         raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Feature store uninitialized.")
