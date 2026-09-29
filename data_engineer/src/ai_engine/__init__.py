@@ -8,6 +8,7 @@ from .trainer import ModelTrainer
 from .evaluator import ModelEvaluator
 from .explainability import ModelExplainer
 from .registry import ModelRegistry
+from .drift_monitor import DriftMonitor
 
 __all__ = [
     "FeaturePipeline",
@@ -15,4 +16,5 @@ __all__ = [
     "ModelEvaluator",
     "ModelExplainer",
     "ModelRegistry",
+    "DriftMonitor",
 ]

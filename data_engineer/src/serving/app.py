@@ -1,11 +1,13 @@
 """
 FastAPI REST Service for Real-Time Telemarketing Lead Scoring and Explainable AI.
-Provides sub-second inference with SHAP factor breakdown.
+Supports Dual-Model Architecture: Pre-Call Prioritization & Post-Call Evaluation.
+Provides sub-second inference with SHAP factor breakdown and optional API Key security.
 """
 
 from contextlib import asynccontextmanager
+import os
 from typing import Any, Dict, List, Optional
-from fastapi import FastAPI, HTTPException, status
+from fastapi import Depends, FastAPI, Header, HTTPException, status
 import numpy as np
 import pandas as pd
 from ..ai_engine.explainability import ModelExplainer
@@ -21,9 +23,28 @@ state: Dict[str, Any] = {
     "pipeline": None,
     "metadata": None,
     "explainer": None,
+    "pre_call_model": None,
+    "pre_call_pipeline": None,
+    "pre_call_metadata": None,
+    "pre_call_explainer": None,
     "feature_store": None,
     "model_registry": None,
 }
+
+DEFAULT_API_KEY = "bm-enterprise-secret-key-2026"
+
+
+def verify_api_key(x_api_key: Optional[str] = Header(default=None)):
+    """Validate X-API-KEY header if REQUIRE_API_KEY is enabled."""
+    required = os.environ.get("REQUIRE_API_KEY", "false").lower() == "true"
+    expected_key = os.environ.get("BANK_MARKETING_API_KEY", DEFAULT_API_KEY)
+    if required:
+        if not x_api_key or x_api_key != expected_key:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid or missing X-API-Key header",
+            )
+    return x_api_key
 
 
 @asynccontextmanager
@@ -35,14 +56,28 @@ async def lifespan(app: FastAPI):
     state["model_registry"] = registry
     state["feature_store"] = FeatureStore(lake_cfg)
 
-    if registry.is_model_available():
-        model, pipeline, metadata = registry.load_active_model()
+    # Load post_call model (default best model)
+    if registry.is_model_available(mode="post_call"):
+        model, pipeline, metadata = registry.load_active_model(mode="post_call")
         state["model"] = model
         state["pipeline"] = pipeline
         state["metadata"] = metadata
+        state["explainer"] = ModelExplainer(model, pipeline, metadata.get("model_type", "lightgbm"))
 
-        explainer = ModelExplainer(model, pipeline, metadata.get("model_type", "lightgbm"))
-        state["explainer"] = explainer
+    # Load pre_call model
+    if registry.is_model_available(mode="pre_call"):
+        p_model, p_pipeline, p_metadata = registry.load_active_model(mode="pre_call")
+        state["pre_call_model"] = p_model
+        state["pre_call_pipeline"] = p_pipeline
+        state["pre_call_metadata"] = p_metadata
+        state["pre_call_explainer"] = ModelExplainer(p_model, p_pipeline, p_metadata.get("model_type", "lightgbm"))
+    elif state.get("model"):
+        # Fallback to default if pre-call model is not trained separately
+        state["pre_call_model"] = state["model"]
+        state["pre_call_pipeline"] = state["pipeline"]
+        state["pre_call_metadata"] = state["metadata"]
+        state["pre_call_explainer"] = state["explainer"]
+
     yield
     # Shutdown logic
     state.clear()
@@ -51,7 +86,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="Bank Marketing AI Lakehouse Lead Scoring API",
     description="Enterprise Real-Time Inference & Explainability Service for Term Deposit Conversion",
-    version="1.0.0",
+    version="1.1.0",
     lifespan=lifespan,
 )
 
@@ -62,55 +97,56 @@ def root():
         "service": "Bank Marketing AI Lead Scoring Engine",
         "status": "online",
         "docs_url": "/docs",
-        "version": "1.0.0",
+        "version": "1.1.0",
+        "supported_modes": ["pre_call", "post_call"],
     }
 
 
 @app.get("/health", tags=["General"])
 def health():
-    is_ready = state.get("model") is not None
+    post_ready = state.get("model") is not None
+    pre_ready = state.get("pre_call_model") is not None
     return {
-        "status": "healthy" if is_ready else "uninitialized",
-        "model_loaded": is_ready,
-        "model_version": state["metadata"].get("version") if is_ready else None,
-        "model_type": state["metadata"].get("model_type") if is_ready else None,
+        "status": "healthy" if (post_ready or pre_ready) else "uninitialized",
+        "model_loaded": post_ready or pre_ready,
+        "pre_call_model_loaded": pre_ready,
+        "post_call_model_loaded": post_ready,
+        "pre_call_threshold": state["pre_call_metadata"].get("optimal_threshold") if pre_ready else None,
+        "post_call_threshold": state["metadata"].get("optimal_threshold") if post_ready else None,
     }
 
 
 @app.get("/api/v1/model/info", tags=["AI Engine"])
-def get_model_info():
+def get_model_info(mode: str = "post_call"):
+    if mode == "pre_call" and state.get("pre_call_metadata"):
+        return state["pre_call_metadata"]
     if not state.get("model"):
         raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Model is not loaded.")
     return state["metadata"]
 
 
-@app.post("/api/v1/predict", tags=["Inference"])
-def predict_lead(payload: CustomerLeadPayload):
-    """
-    Predict conversion probability and explain key drivers for an incoming lead.
-    """
-    if not state.get("model"):
+def _score_lead_internal(payload: CustomerLeadPayload, mode: str = "post_call") -> Dict[str, Any]:
+    target_model = state.get("pre_call_model") if mode == "pre_call" else state.get("model")
+    target_pipeline = state.get("pre_call_pipeline") if mode == "pre_call" else state.get("pipeline")
+    target_explainer = state.get("pre_call_explainer") if mode == "pre_call" else state.get("explainer")
+    target_meta = state.get("pre_call_metadata") if mode == "pre_call" else state.get("metadata")
+
+    if not target_model or not target_pipeline:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Model is not loaded. Please train a model first.",
+            detail=f"Model for mode '{mode}' is not loaded. Please train a model first.",
         )
 
-    # Convert payload to dict and derive feature store columns
     lead_dict = payload.model_dump()
+    if mode == "pre_call":
+        lead_dict["duration"] = 0
+
     derived_dict = FeatureStore.derive_lead_features(lead_dict)
     df_lead = pd.DataFrame([derived_dict])
 
-    pipeline = state["pipeline"]
-    model = state["model"]
-    explainer = state["explainer"]
-    metadata = state["metadata"]
-    opt_threshold = metadata.get("optimal_threshold", 0.5)
-
-    # Preprocessing
-    X_trans = pipeline.transform(df_lead)
-
-    # Inference
-    prob = float(model.predict_proba(X_trans)[0, 1])
+    opt_threshold = target_meta.get("optimal_threshold", 0.5) if target_meta else 0.5
+    X_trans = target_pipeline.transform(df_lead)
+    prob = float(target_model.predict_proba(X_trans)[0, 1])
     is_recommended = bool(prob >= opt_threshold)
 
     # Assign Priority Tier
@@ -127,42 +163,87 @@ def predict_lead(payload: CustomerLeadPayload):
         tier = "Tier 4 (Cold)"
         action = "Không gọi điện trong đợt này"
 
-    # SHAP local attribution
     drivers = {"positive_drivers": [], "negative_drivers": []}
-    if explainer:
+    if target_explainer:
         try:
-            drivers = explainer.explain_single_lead(X_trans[0], top_k=3)
+            drivers = target_explainer.explain_single_lead(X_trans[0], top_k=3)
         except Exception:
             pass
 
     return {
         "customer_id": payload.customer_id,
+        "mode": mode,
         "conversion_probability": round(prob, 4),
         "is_recommended_call": is_recommended,
         "decision_threshold": round(opt_threshold, 3),
         "priority_tier": tier,
         "recommended_action": action,
-        "top_positive_drivers": drivers["positive_drivers"],
-        "top_negative_barriers": drivers["negative_drivers"],
+        "top_positive_drivers": drivers.get("positive_drivers", []),
+        "top_negative_barriers": drivers.get("negative_drivers", []),
     }
 
 
+@app.post("/api/v1/predict/pre-call", tags=["Inference"])
+def predict_pre_call(
+    payload: CustomerLeadPayload,
+    _auth: Optional[str] = Depends(verify_api_key),
+):
+    """
+    Score incoming lead BEFORE dialing (duration is excluded to prevent lookahead bias).
+    Ideal for morning telesales dialing priority queue.
+    """
+    return _score_lead_internal(payload, mode="pre_call")
+
+
+@app.post("/api/v1/predict/post-call", tags=["Inference"])
+def predict_post_call(
+    payload: CustomerLeadPayload,
+    _auth: Optional[str] = Depends(verify_api_key),
+):
+    """
+    Score customer AFTER conversation (includes duration for accurate post-call conversion scoring).
+    """
+    return _score_lead_internal(payload, mode="post_call")
+
+
+@app.post("/api/v1/predict", tags=["Inference"])
+def predict_lead(
+    payload: CustomerLeadPayload,
+    _auth: Optional[str] = Depends(verify_api_key),
+):
+    """
+    Smart router endpoint:
+    - If duration == 0, routes to pre-call scoring.
+    - If duration > 0, routes to post-call scoring.
+    """
+    mode = "pre_call" if (payload.duration is None or payload.duration == 0) else "post_call"
+    return _score_lead_internal(payload, mode=mode)
+
+
 @app.post("/api/v1/batch-predict", tags=["Inference"])
-def batch_predict(leads: List[CustomerLeadPayload]):
+def batch_predict(
+    leads: List[CustomerLeadPayload],
+    mode: str = "auto",
+    _auth: Optional[str] = Depends(verify_api_key),
+):
     """
     Batch score a list of customer leads.
+    mode can be 'auto', 'pre_call', or 'post_call'.
     """
-    if not state.get("model"):
-        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Model is not loaded.")
-
     results = []
     for lead in leads:
-        results.append(predict_lead(lead))
+        lead_mode = mode
+        if mode == "auto":
+            lead_mode = "pre_call" if (lead.duration is None or lead.duration == 0) else "post_call"
+        results.append(_score_lead_internal(lead, mode=lead_mode))
     return {"total_scored": len(results), "leads": results}
 
 
 @app.get("/api/v1/features/{customer_id}", tags=["Feature Store"])
-def get_customer_features(customer_id: str):
+def get_customer_features(
+    customer_id: str,
+    _auth: Optional[str] = Depends(verify_api_key),
+):
     """
     Retrieve online features for an existing customer from the Lakehouse.
     """
@@ -172,5 +253,8 @@ def get_customer_features(customer_id: str):
 
     feat = fs.get_online_features(customer_id)
     if not feat:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Customer {customer_id} not found in Lakehouse.")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Customer {customer_id} not found in Lakehouse.",
+        )
     return feat

@@ -1,0 +1,15 @@
+services:
+  bank-marketing-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: bank_marketing_serving
+    ports:
+      - "8000:8000"
+    environment:
+      - REQUIRE_API_KEY=false
+      - BANK_MARKETING_API_KEY=bm-enterprise-secret-key-2026
+    volumes:
+      - ./data_engineer/data:/app/data_engineer/data
+      - ./data_engineer/models:/app/data_engineer/models
+    restart: unless-stopped

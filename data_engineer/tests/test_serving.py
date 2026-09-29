@@ -74,6 +74,20 @@ def test_fastapi_endpoints():
         assert "top_positive_drivers" in data_pred
         assert "top_negative_barriers" in data_pred
 
+        # Pre-call predict (without duration)
+        res_pre = client.post("/api/v1/predict/pre-call", json=payload)
+        assert res_pre.status_code == 200
+        data_pre = res_pre.json()
+        assert data_pre["mode"] == "pre_call"
+        assert "conversion_probability" in data_pre
+
+        # Post-call predict (with duration)
+        res_post = client.post("/api/v1/predict/post-call", json=payload)
+        assert res_post.status_code == 200
+        data_post = res_post.json()
+        assert data_post["mode"] == "post_call"
+        assert "conversion_probability" in data_post
+
         # Batch Predict
         res_batch = client.post("/api/v1/batch-predict", json=[payload, payload])
         assert res_batch.status_code == 200

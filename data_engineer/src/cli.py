@@ -73,13 +73,10 @@ def cmd_run_lakehouse(args):
     print("[SUCCESS] All Lakehouse Layers (Bronze -> Silver -> Gold -> Features) successfully processed!")
 
 
-def cmd_train(args):
-    print(f"[*] [AI Engine] Training model type: {args.model}")
-    fs = FeatureStore()
-    df_features = fs.get_offline_features()
-
+def _train_single_mode(df_features, model_type: str, mode: str):
+    print(f"[*] [AI Engine] Training model type: {model_type} (operational mode: {mode})")
     trainer = ModelTrainer()
-    train_res = trainer.train(df_features, model_type=args.model)
+    train_res = trainer.train(df_features, model_type=model_type, mode=mode)
 
     model = train_res["model"]
     pipeline = train_res["pipeline"]
@@ -99,7 +96,7 @@ def cmd_train(args):
     )
 
     # Global SHAP importance
-    explainer = ModelExplainer(model, pipeline, model_type=args.model)
+    explainer = ModelExplainer(model, pipeline, model_type=model_type)
     global_importance = explainer.get_global_importance(splits["X_train_trans"], top_n=8)
 
     # Register model
@@ -110,10 +107,11 @@ def cmd_train(args):
         metrics=test_metrics,
         threshold_info=threshold_info,
         global_importance=global_importance,
-        model_type=args.model,
+        model_type=model_type,
+        mode=mode,
     )
 
-    print("[OK] Model Training & Registration Completed!")
+    print(f"[OK] Model Training & Registration Completed for [{mode}]!")
     print(f"   ROC-AUC: {test_metrics['roc_auc']:.4f} | PR-AUC: {test_metrics['pr_auc']:.4f}")
     print(f"   F1-Score: {test_metrics['f1_score']:.4f} (at Optimal Threshold {test_metrics['threshold_used']})")
     print(f"   Precision: {test_metrics['precision']:.4f} | Recall: {test_metrics['recall']:.4f}")
@@ -121,6 +119,16 @@ def cmd_train(args):
     for feat in global_importance[:5]:
         print(f"     - {feat['feature']}: {feat['importance']}")
     print(f"   Artifacts saved to: {registry.registry_dir}")
+
+
+def cmd_train(args):
+    fs = FeatureStore()
+    df_features = fs.get_offline_features()
+    mode = getattr(args, "mode", "both")
+    if mode in ["both", "pre_call"]:
+        _train_single_mode(df_features, args.model, mode="pre_call")
+    if mode in ["both", "post_call"]:
+        _train_single_mode(df_features, args.model, mode="post_call")
 
 
 def cmd_batch_score(args):
@@ -183,6 +191,7 @@ def main():
     # Train
     p_train = subparsers.add_parser("train", help="Train model and register artifacts")
     p_train.add_argument("--model", default="lightgbm", choices=["lightgbm", "logistic_regression"], help="Model type")
+    p_train.add_argument("--mode", default="both", choices=["pre_call", "post_call", "both"], help="Model operational mode")
 
     # Batch score
     p_score = subparsers.add_parser("batch-score", help="Batch score leads for telemarketing")

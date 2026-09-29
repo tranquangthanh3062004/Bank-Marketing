@@ -13,9 +13,14 @@ from ..config import ModelConfig, load_model_config
 
 
 class FeaturePipeline:
-    def __init__(self, config: Optional[ModelConfig] = None):
+    def __init__(self, config: Optional[ModelConfig] = None, mode: str = "post_call"):
         self.config = config or load_model_config()
-        self.numerical_cols = self.config.features.numerical
+        self.mode = mode
+        if self.mode == "pre_call":
+            # Exclude duration to avoid lookahead bias for pre-call lead scoring
+            self.numerical_cols = [c for c in self.config.features.numerical if c != "duration"]
+        else:
+            self.numerical_cols = list(self.config.features.numerical)
         self.categorical_cols = self.config.features.categorical + self.config.features.binary
         self.preprocessor: Optional[ColumnTransformer] = None
         self.feature_names: List[str] = []

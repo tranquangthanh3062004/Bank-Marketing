@@ -53,7 +53,8 @@ class ModelTrainer:
     def train(
         self,
         df_features: pd.DataFrame,
-        model_type: Optional[str] = None
+        model_type: Optional[str] = None,
+        mode: str = "post_call",
     ) -> Dict[str, Any]:
         """
         Full training workflow.
@@ -64,7 +65,7 @@ class ModelTrainer:
         X_train, X_val, X_test, y_train, y_val, y_test = self.prepare_data_splits(df_features)
 
         # Fit feature pipeline on Train fold only
-        pipeline = FeaturePipeline(self.config)
+        pipeline = FeaturePipeline(self.config, mode=mode)
         X_train_trans = pipeline.fit_transform(X_train)
         X_val_trans = pipeline.transform(X_val)
         X_test_trans = pipeline.transform(X_test)

@@ -73,7 +73,11 @@ class LakehouseTransformation:
         if "y" in df_bronze.columns:
             fact_cols.append("y")
 
-        df_fact = df_bronze[fact_cols].copy()
+        df_fact = (
+            df_bronze[fact_cols]
+            .drop_duplicates(subset=["customer_id", "contact", "day", "month", "duration", "campaign"])
+            .copy()
+        )
         df_fact["interaction_id"] = [f"INT_{i:07d}" for i in range(len(df_fact))]
         df_fact["day"] = df_fact["day"].astype(int)
         df_fact["duration"] = df_fact["duration"].astype(float)

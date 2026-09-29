@@ -50,7 +50,9 @@ class LakehouseConfig(BaseModel):
 
     @property
     def abs_db_path(self) -> Path:
-        p = PACKAGE_ROOT / self.database_path
+        p = Path(self.database_path)
+        if not p.is_absolute():
+            p = PACKAGE_ROOT / p
         p.parent.mkdir(parents=True, exist_ok=True)
         return p
 
@@ -63,7 +65,9 @@ class LakehouseConfig(BaseModel):
             "quarantine": self.storage.quarantine_dir,
             "raw": self.storage.raw_dir,
         }
-        p = PACKAGE_ROOT / mapping[layer]
+        p = Path(mapping[layer])
+        if not p.is_absolute():
+            p = PACKAGE_ROOT / p
         p.mkdir(parents=True, exist_ok=True)
         return p
 
@@ -87,7 +91,9 @@ class ModelConfig(BaseModel):
 
     @property
     def abs_registry_dir(self) -> Path:
-        p = PACKAGE_ROOT / self.registry_dir
+        p = Path(self.registry_dir)
+        if not p.is_absolute():
+            p = PACKAGE_ROOT / p
         p.mkdir(parents=True, exist_ok=True)
         return p
 
